@@ -245,16 +245,18 @@ SELECT a.first_name, a.last_name, email, b.test, b.grade FROM students as a
 GO
 
 -- Joining related tables with left outer joins
+select * from students
+select * from student_projects
 /* inner join - JOIN  students and student_projects tables*/ 
 SELECT students.first_name, students.last_name, student_projects.title
     FROM students
-    JOIN student_projects
+    JOIN (select * from student_projects where id = 1) as student_projects
     ON students.id = student_projects.student_id;				-- 1 record, matching record which is Peter
 
 /* outer join - JOIN  students and student_projects tables */ 
 SELECT students.first_name, students.last_name, student_projects.title
     FROM students
-    LEFT OUTER JOIN student_projects
+    LEFT OUTER JOIN (select * from student_projects where id = 1) as student_projects
     ON students.id = student_projects.student_id;				-- 4 records, Alice, Aladdin, Simba do not have project title
 GO
 
@@ -264,7 +266,7 @@ SELECT id, first_name, last_name, buddy_id FROM students;
 /* self join - look at the buddy's name and email */ 
 SELECT students.first_name, students.last_name, CONCAT(buddies.first_name,', ',buddies.last_name) as buddy_full_name, buddies.email as buddy_email
     FROM students
-    JOIN students buddies
+    JOIN students as buddies
     ON students.buddy_id = buddies.id;
 GO
 
@@ -301,14 +303,16 @@ INSERT INTO diary_logs (user_id, date, content) VALUES (1, '2015-04-02',
 
 SELECT * FROM diary_logs;
 
-UPDATE diary_logs SET content = 'I had a horrible fight with OhNoesGuy' WHERE id = 1;
+UPDATE diary_logs SET content = 'I had a horrible fight with OhNoesGuy' WHERE id = 1;  ---update content of id=1
 
 SELECT * FROM diary_logs;
 
-DELETE FROM diary_logs WHERE id = 1;
+DELETE FROM diary_logs WHERE id = 1;   ---delete record of id=1
 
 SELECT * FROM diary_logs;
 GO 
+
+
 
 -- Altering tables after creation
 ALTER TABLE diary_logs ADD emotion varchar(30) default 'unknown';
@@ -319,8 +323,16 @@ INSERT INTO diary_logs (user_id, date, content, emotion) VALUES (1, '2015-04-03'
     
 SELECT * FROM diary_logs;
 
+UPDATE diary_logs SET emotion = 'unknown' WHERE emotion IS NULL;  -- update Null values
+
+SELECT * FROM diary_logs;
+
+
 /* look up the table schema */ 
 select *
 from INFORMATION_SCHEMA.COLUMNS
 where TABLE_NAME='diary_logs'
 GO
+
+SELECT * FROM diary_logs;
+GO 
